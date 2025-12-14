@@ -1,0 +1,228 @@
+/* src/components/ExerciseEntryForm.tsx */
+import React, { useState } from 'react';
+import type { ExerciseLogEntry } from '../types/exercise';
+import { EXERCISE_GROUPS } from '../data/exerciseGroups';
+import ExerciseSetForm from './ExerciseSetForm';
+import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell } from 'lucide-react';
+import { format } from 'date-fns';
+
+interface ExerciseEntryFormProps {
+  entry: ExerciseLogEntry;
+  index: number;
+  totalEntries: number;
+  onUpdate: (updates: Partial<ExerciseLogEntry>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}
+
+const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
+  entry,
+  index,
+  totalEntries,
+  onUpdate,
+  onRemove,
+  onMoveUp,
+  onMoveDown
+}) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const addSet = () => {
+    const lastSet = entry.sets[entry.sets.length - 1];
+    const newSet = {
+      weight: lastSet?.weight || 0,
+      reps: lastSet?.reps || 0
+    };
+    onUpdate({ sets: [...entry.sets, newSet] });
+  };
+
+  const updateSet = (setIndex: number, updates: Partial<ExerciseLogEntry['sets'][0]>) => {
+    const newSets = [...entry.sets];
+    newSets[setIndex] = { ...newSets[setIndex], ...updates };
+    onUpdate({ sets: newSets });
+  };
+
+  const removeSet = (setIndex: number) => {
+    if (entry.sets.length <= 1) return;
+    const newSets = entry.sets.filter((_, i) => i !== setIndex);
+    onUpdate({ sets: newSets });
+  };
+
+  const calculateVolume = () => {
+    return entry.sets.reduce((total, set) => total + (set.weight * set.reps), 0);
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div 
+        className="p-4 flex items-center justify-between border-b border-gray-200 cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Dumbbell className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">
+              {entry.exercise.name || 'New Exercise'}
+            </h3>
+            <p className="text-sm text-gray-500">
+              {entry.sets.length} sets • {calculateVolume().toFixed(1)} kg total
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveUp();
+              }}
+              disabled={index === 0}
+              className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveDown();
+              }}
+              disabled={index === totalEntries - 1}
+              className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      {isExpanded && (
+        <div className="p-4 space-y-4">
+          {/* Exercise Selection */}
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-1">
+                Muscle Group
+              </label>
+              <select
+                value={entry.exercise.group}
+                onChange={(e) => onUpdate({
+                  exercise: { ...entry.exercise, group: e.target.value, name: '' }
+                })}
+                className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select group</option>
+                {Object.keys(EXERCISE_GROUPS).map((group) => (
+                  <option key={group} value={group}>{group}</option>
+                ))}
+              </select>
+            </div>
+
+            {entry.exercise.group && (
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Exercise
+                </label>
+                <select
+                  value={entry.exercise.name}
+                  onChange={(e) => onUpdate({
+                    exercise: { ...entry.exercise, name: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select exercise</option>
+                  {EXERCISE_GROUPS[entry.exercise.group as keyof typeof EXERCISE_GROUPS]?.map((exercise) => (
+                    <option key={exercise} value={exercise}>{exercise}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Failure Toggle */}
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+              <p className="font-medium text-gray-900">Failure</p>
+              <p className="text-xs text-gray-500">Train to failure?</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onUpdate({ failure: !entry.failure })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                entry.failure ? 'bg-red-500' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  entry.failure ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Sets */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <h4 className="font-medium text-gray-900">Sets</h4>
+              <button
+                type="button"
+                onClick={addSet}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 font-medium rounded-lg"
+              >
+                <Plus className="w-4 h-4" />
+                Add Set
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              {entry.sets.map((set, setIndex) => (
+                <ExerciseSetForm
+                  key={setIndex}
+                  set={set}
+                  index={setIndex}
+                  onUpdate={(updates) => updateSet(setIndex, updates)}
+                  onRemove={() => removeSet(setIndex)}
+                  isRemovable={entry.sets.length > 1}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Timestamp */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Time
+            </label>
+            <input
+              type="datetime-local"
+              value={format(new Date(entry.timestamp), "yyyy-MM-dd'T'HH:mm")}
+              onChange={(e) => onUpdate({
+                timestamp: new Date(e.target.value).toISOString()
+              })}
+              className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ExerciseEntryForm;
