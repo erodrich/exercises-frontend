@@ -1,6 +1,6 @@
 /* src/components/ExerciseEntryForm.tsx */
 import React, { useState } from 'react';
-import type { ExerciseLogEntry } from '../types/exercise';
+import type { ExerciseLogEntry } from '../domain/models';
 import { EXERCISE_GROUPS } from '../data/exerciseGroups';
 import ExerciseSetForm from './ExerciseSetForm';
 import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell } from 'lucide-react';

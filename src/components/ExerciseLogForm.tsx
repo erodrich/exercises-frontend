@@ -1,66 +1,47 @@
 /* src/components/ExerciseLogForm.tsx */
-import React, { useState } from 'react';
-import type { ExerciseLogEntry } from '../types/exercise';
+import React from 'react';
+import type { ExerciseLogEntry } from '../domain/models';
 import ExerciseEntryForm from './ExerciseEntryForm';
 import { Save, Copy, X } from 'lucide-react';
+import { useExerciseService } from '../hooks/useExerciseService';
+import { useExerciseForm } from '../hooks/useExerciseForm';
+import { useNotification } from '../hooks/useNotification';
 
 interface ExerciseLogFormProps {
   onNavigateBack?: () => void;
 }
 
 const ExerciseLogForm: React.FC<ExerciseLogFormProps> = ({ onNavigateBack }) => {
-  const [entry, setEntry] = useState<ExerciseLogEntry>({
+  const service = useExerciseService();
+  const notifier = useNotification();
+
+  const initialEntry: ExerciseLogEntry = {
     timestamp: new Date().toISOString(),
     exercise: { group: 'Chest', name: '' },
     sets: [{ weight: 0, reps: 0 }],
     failure: false
-  });
-
-  const updateEntry = (updates: Partial<ExerciseLogEntry>) => {
-    setEntry({ ...entry, ...updates });
   };
+
+  const { entry, updateEntry, handleSubmit: submitForm, isSubmitting, errors } = useExerciseForm(
+    service,
+    initialEntry,
+    () => {
+      notifier.success('Exercise saved successfully!');
+      if (onNavigateBack) {
+        onNavigateBack();
+      }
+    }
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate
-    const isValid = 
-      entry.exercise.group &&
-      entry.exercise.name &&
-      entry.sets.every(set => set.weight > 0 && set.reps > 0);
-
-    if (!isValid) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    // Format data
-    const formattedData = {
-      ...entry,
-      timestamp: new Date(entry.timestamp).toLocaleString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      }).replace(',', '')
-    };
-
-    console.log('Submitted data:', formattedData);
-    alert('Exercise saved successfully!');
-    
-    // Navigate back to home after saving
-    if (onNavigateBack) {
-      onNavigateBack();
-    }
+    submitForm();
   };
 
   const copyToClipboard = () => {
     const jsonString = JSON.stringify(entry, null, 2);
     navigator.clipboard.writeText(jsonString);
-    alert('JSON copied to clipboard!');
+    notifier.info('JSON copied to clipboard!');
   };
 
 
@@ -102,6 +83,15 @@ const ExerciseLogForm: React.FC<ExerciseLogFormProps> = ({ onNavigateBack }) => 
           </div>
         </div>
 
+        {/* Errors */}
+        {errors.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            {errors.map((error, idx) => (
+              <p key={idx} className="text-red-600 text-sm">{error}</p>
+            ))}
+          </div>
+        )}
+
         {/* Exercise Entry */}
         <div>
           <ExerciseEntryForm
@@ -114,6 +104,13 @@ const ExerciseLogForm: React.FC<ExerciseLogFormProps> = ({ onNavigateBack }) => 
             onMoveDown={() => {}}
           />
         </div>
+
+        {/* Loading State */}
+        {isSubmitting && (
+          <div className="text-center text-gray-600 py-4">
+            <p>Saving...</p>
+          </div>
+        )}
       </div>
     </form>
   );

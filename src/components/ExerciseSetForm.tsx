@@ -1,6 +1,6 @@
 /* src/components/ExerciseSetForm.tsx */
 import React from 'react';
-import type { ExerciseSet } from '../types/exercise';
+import type { ExerciseSet } from '../domain/models';
 import { Trash2 } from 'lucide-react';
 
 interface ExerciseSetFormProps {
