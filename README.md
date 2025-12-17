@@ -6,6 +6,8 @@ A professionally architected React + TypeScript exercise tracking application bu
 
 ## 🚀 Quick Start
 
+### Local Development
+
 ```bash
 # Install dependencies
 npm install
@@ -20,6 +22,20 @@ npm test
 npm run build
 ```
 
+### Docker Deployment
+
+```bash
+# Build and push to Docker Hub
+export DOCKER_USERNAME=your-username
+./buildAndPush.sh 1.0.0
+
+# Deploy with infrastructure
+cd ../exercises-infra/dev
+docker-compose up -d frontend
+```
+
+📖 **See [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) for complete Docker guide**
+
 ---
 
 ## 📊 Project Status
@@ -32,24 +48,24 @@ npm run build
 
 ---
 
-## 📚 Documentation Index
+## 📚 Documentation
 
-### Getting Started
-- **[README.md](./README.md)** - This file
-- **[QUICK_START_TESTING.md](./QUICK_START_TESTING.md)** - Testing quick reference
+All documentation is located in the `docs/` directory:
 
-### Complete Project Documentation
-- **[TDD_REFACTOR_COMPLETE.md](./TDD_REFACTOR_COMPLETE.md)** - Full refactor documentation
-- **[REFACTOR_COMPLETE_SUMMARY.txt](./REFACTOR_COMPLETE_SUMMARY.txt)** - Visual summary
+### Docker & Deployment
+- 📖 **[docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md)** - Docker deployment guide
 
-### Phase Documentation
-- **[TESTING_SETUP_COMPLETE.md](./TESTING_SETUP_COMPLETE.md)** - Phase 1: Testing infrastructure
-- **[PHASE_1_SUMMARY.txt](./PHASE_1_SUMMARY.txt)** - Phase 1 visual summary
-- **[PHASE_2_COMPLETE.md](./PHASE_2_COMPLETE.md)** - Phase 2: Domain logic extraction
-- **[PHASE_2_SUMMARY.txt](./PHASE_2_SUMMARY.txt)** - Phase 2 visual summary
+### Development Guides
+- 📖 **[docs/TDD_REFACTOR_COMPLETE.md](docs/TDD_REFACTOR_COMPLETE.md)** - Complete TDD refactoring
+- 📖 **[docs/QUICK_START_TESTING.md](docs/QUICK_START_TESTING.md)** - Testing quick reference
+- 📖 **[src/test/README.md](src/test/README.md)** - Comprehensive testing guide
 
-### Testing Guide
-- **[src/test/README.md](./src/test/README.md)** - Comprehensive testing guide
+### Project History
+- 📖 **[docs/TESTING_SETUP_COMPLETE.md](docs/TESTING_SETUP_COMPLETE.md)** - Phase 1: Testing infrastructure
+- 📖 **[docs/PHASE_1_SUMMARY.md](docs/PHASE_1_SUMMARY.md)** - Phase 1 summary
+- 📖 **[docs/PHASE_2_COMPLETE.md](docs/PHASE_2_COMPLETE.md)** - Phase 2: Domain extraction
+- 📖 **[docs/PHASE_2_SUMMARY.md](docs/PHASE_2_SUMMARY.md)** - Phase 2 summary
+- 📖 **[docs/REFACTOR_COMPLETE_SUMMARY.md](docs/REFACTOR_COMPLETE_SUMMARY.md)** - Complete summary
 
 ---
 
@@ -163,14 +179,24 @@ Lines:        98.7%  ✅
 
 ## 🛠️ Tech Stack
 
+**Core:**
 - **React 19** - UI framework
 - **TypeScript** - Type safety
 - **Vite** - Build tool
 - **Tailwind CSS v4** - Styling
+
+**Testing:**
 - **Vitest** - Testing framework
 - **React Testing Library** - Component testing
+
+**Utilities:**
 - **date-fns** - Date utilities
 - **Lucide React** - Icons
+
+**Deployment:**
+- **Docker** - Containerization
+- **Nginx** - Static file serving
+- **Docker Hub** - Image registry
 
 ---
 
@@ -221,7 +247,7 @@ Lines:        98.7%  ✅
 
 ## 🚀 Production Deployment
 
-### Build
+### Traditional Build
 
 ```bash
 npm run build
@@ -232,11 +258,24 @@ Output: `dist/` directory
 - **CSS** - 18.41 KB (gzipped: 4.08 KB)
 - **JS** - 230.49 KB (gzipped: 71.75 KB)
 
-### Preview
+### Docker Deployment (Recommended)
 
 ```bash
-npm run preview
+# Build Docker image
+export DOCKER_USERNAME=your-username
+./buildAndPush.sh 1.0.0
+
+# Deploy full stack
+cd ../exercises-infra/prod
+docker-compose up -d
 ```
+
+**Access points:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8080/exercise-logging
+- Swagger UI: http://localhost:8080/exercise-logging/swagger-ui/index.html
+
+📖 **Complete deployment guide**: [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md)
 
 ---
 
