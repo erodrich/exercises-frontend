@@ -1,6 +1,7 @@
-import type { ExerciseLogEntry, Result } from '../domain/models';
+import type { ExerciseLogEntry, Result, User } from '../domain/models';
 import type { StorageAdapter } from '../infrastructure/adapters/StorageAdapter';
 import type { NotificationAdapter } from '../infrastructure/adapters/NotificationAdapter';
+import { ApiExerciseAdapter } from '../infrastructure/adapters/ApiExerciseAdapter';
 import { validateExercise } from '../domain/validators/exerciseValidator';
 import { formatExerciseForStorage } from '../domain/formatters/exerciseFormatter';
 import { calculateTotalVolume } from '../domain/calculators/volumeCalculator';
@@ -24,17 +25,30 @@ export class ExerciseService {
   private readonly storage: StorageAdapter;
   // @ts-expect-error - notifier will be used for future notifications
   private readonly notifier: NotificationAdapter;
+  private readonly apiAdapter: ApiExerciseAdapter;
+  private readonly useApi: boolean;
+  private currentUser: User | null = null;
 
   constructor(
     storage: StorageAdapter,
-    notifier: NotificationAdapter
+    notifier: NotificationAdapter,
+    useApi: boolean = false
   ) {
     this.storage = storage;
     this.notifier = notifier;
+    this.apiAdapter = new ApiExerciseAdapter();
+    this.useApi = useApi;
   }
 
   /**
-   * Save an exercise to storage
+   * Set current user for API calls
+   */
+  setCurrentUser(user: User | null): void {
+    this.currentUser = user;
+  }
+
+  /**
+   * Save an exercise to storage or API
    */
   async saveExercise(entry: ExerciseLogEntry): Promise<Result<void>> {
     try {
@@ -48,13 +62,14 @@ export class ExerciseService {
         };
       }
 
-      // Format for storage
+      // Use API if enabled and user is authenticated
+      if (this.useApi && this.currentUser) {
+        return await this.apiAdapter.saveExercise(this.currentUser.id, entry);
+      }
+
+      // Otherwise use localStorage
       const formatted = formatExerciseForStorage(entry);
-
-      // Generate unique key
       const key = `${this.EXERCISE_KEY_PREFIX}${Date.now()}`;
-
-      // Save to storage
       await this.storage.save(key, formatted);
 
       return { success: true, data: undefined };
@@ -67,22 +82,25 @@ export class ExerciseService {
   }
 
   /**
-   * Load all exercises from storage
+   * Load all exercises from storage or API
    */
   async loadExercises(): Promise<ExerciseLogEntry[]> {
     try {
-      // Get all exercise keys
+      // Use API if enabled and user is authenticated
+      if (this.useApi && this.currentUser) {
+        return await this.apiAdapter.loadExercises(this.currentUser.id);
+      }
+
+      // Otherwise use localStorage
       const allKeys = await this.storage.keys();
       const exerciseKeys = allKeys.filter(key => 
         key.startsWith(this.EXERCISE_KEY_PREFIX)
       );
 
-      // Load all exercises
       const exercises = await Promise.all(
         exerciseKeys.map(key => this.storage.load<ExerciseLogEntry>(key))
       );
 
-      // Filter out null values
       return exercises.filter((ex): ex is ExerciseLogEntry => ex !== null);
     } catch (error) {
       console.error('Failed to load exercises:', error);

@@ -1,17 +1,19 @@
-import { useMemo } from 'react';
-import { ExerciseService } from '../services/exerciseService';
-import { LocalStorageAdapter } from '../infrastructure/storage/localStorageAdapter';
-import { useNotification } from './useNotification';
+import { useEffect } from 'react';
+import { exerciseService } from '../config/exercise';
+import { useAuth } from './useAuth';
+import type { ExerciseService } from '../services/exerciseService';
 
 /**
- * Hook for accessing the ExerciseService with proper dependencies
- * Creates service instance with real adapters
+ * Hook for accessing the ExerciseService
+ * Automatically syncs current user with the service for API calls
  */
 export function useExerciseService(): ExerciseService {
-  const notifier = useNotification();
+  const { user } = useAuth();
 
-  return useMemo(() => {
-    const storage = new LocalStorageAdapter();
-    return new ExerciseService(storage, notifier);
-  }, [notifier]);
+  // Update current user whenever it changes
+  useEffect(() => {
+    exerciseService.setCurrentUser(user);
+  }, [user]);
+
+  return exerciseService;
 }

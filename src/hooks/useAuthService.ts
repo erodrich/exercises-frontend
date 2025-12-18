@@ -1,14 +1,10 @@
-import { useMemo } from 'react';
-import { AuthService } from '../services/authService';
-import { MockAuthStorage } from '../infrastructure/auth/MockAuthStorage';
+import { authService } from '../config/auth';
+import type { AuthService } from '../services/authService';
 
 /**
  * Hook to get AuthService instance
- * Uses singleton pattern to ensure same instance across app
+ * Returns the configured auth service (Mock or API based on environment)
  */
 export function useAuthService(): AuthService {
-  return useMemo(() => {
-    const authStorage = new MockAuthStorage();
-    return new AuthService(authStorage);
-  }, []);
+  return authService;
 }
