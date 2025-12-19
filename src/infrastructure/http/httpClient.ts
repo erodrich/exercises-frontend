@@ -124,7 +124,9 @@ export async function del<T>(url: string, options?: HttpClientOptions): Promise<
 
   // DELETE might not return content
   const text = await response.text();
-  return text ? JSON.parse(text) : null;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+    return text ? JSON.parse(text) : null;
 }
 
 /**

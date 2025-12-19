@@ -5,7 +5,6 @@
 
 import { HttpAdminService, MockAdminService } from '../services/adminService';
 import type { AdminService } from '../services/adminService';
-import { authService } from './auth';
 
 // Determine which service to use based on environment variable
 const USE_MOCK_ADMIN = import.meta.env.VITE_USE_MOCK_ADMIN === 'true';

@@ -123,7 +123,7 @@ export class ApiExerciseAdapter {
     console.warn('Delete exercise not yet implemented in backend');
     return {
       success: false,
-      error: 'Delete functionality not yet implemented',
+      error: 'Delete functionality not yet implemented' + exerciseId,
     };
   }
 
