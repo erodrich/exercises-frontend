@@ -2,8 +2,9 @@
 // This file manages the API base URL based on environment
 
 export const API_CONFIG = {
-  // Get API URL from environment variable or default to localhost
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/exercise-logging',
+  // Use relative URL - Nginx will proxy to backend via Docker network
+  // This works on any server without configuration!
+  baseURL: import.meta.env.VITE_API_URL || '/exercise-logging',
   
   // API endpoints
   endpoints: {
