@@ -18,15 +18,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, loading = false
     e.preventDefault();
     setError(null);
 
-    const result = await onRegister({
-      username,
-      email,
-      password,
-      confirmPassword,
-    });
+    try {
+      const result = await onRegister({
+        username,
+        email,
+        password,
+        confirmPassword,
+      });
 
-    if (!result.success && result.error) {
-      setError(result.error);
+      if (!result.success) {
+        // Show error message
+        setError(result.error || 'Registration failed. Please try again.');
+      }
+      // If success, the parent component will handle navigation
+    } catch (err) {
+      // Handle unexpected errors
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Registration error:', err);
     }
   };
 

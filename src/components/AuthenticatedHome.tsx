@@ -1,16 +1,18 @@
 import React from 'react';
-import { Dumbbell, Plus, LogOut, User } from 'lucide-react';
+import { Dumbbell, Plus, LogOut, User, Shield } from 'lucide-react';
 import type { User as UserType } from '../domain/models';
 
 interface AuthenticatedHomeProps {
   user: UserType;
   onNavigateToLog: () => void;
+  onNavigateToAdmin?: () => void;
   onLogout: () => void;
 }
 
 const AuthenticatedHome: React.FC<AuthenticatedHomeProps> = ({
   user,
   onNavigateToLog,
+  onNavigateToAdmin,
   onLogout,
 }) => {
   return (
@@ -54,8 +56,8 @@ const AuthenticatedHome: React.FC<AuthenticatedHomeProps> = ({
             </p>
           </div>
 
-          {/* Main CTA Button */}
-          <div className="pt-4">
+          {/* Action Buttons */}
+          <div className="pt-4 space-y-4">
             <button
               onClick={onNavigateToLog}
               className="w-full max-w-sm mx-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg"
@@ -63,6 +65,17 @@ const AuthenticatedHome: React.FC<AuthenticatedHomeProps> = ({
               <Plus className="w-6 h-6" />
               Log New Workout
             </button>
+            
+            {/* Admin Button - Only shown for admin users */}
+            {onNavigateToAdmin && (
+              <button
+                onClick={onNavigateToAdmin}
+                className="w-full max-w-sm mx-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3"
+              >
+                <Shield className="w-5 h-5" />
+                Admin Dashboard
+              </button>
+            )}
           </div>
 
           {/* Quick Stats */}
