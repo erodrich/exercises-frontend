@@ -48,15 +48,12 @@ export function useAuth() {
    * Login operation
    */
   const login = useCallback(async (credentials: LoginCredentials) => {
-    console.log('[useAuth] Login attempt:', credentials.email);
     setError(null);
     setLoading(true);
 
     const result = await authService.login(credentials);
-    console.log('[useAuth] Login result:', result);
 
     if (result.success) {
-      console.log('[useAuth] Login successful');
       setAuthState({
         isAuthenticated: true,
         user: result.data.user,
@@ -65,7 +62,6 @@ export function useAuth() {
       setLoading(false);
       return { success: true };
     } else {
-      console.log('[useAuth] Login failed:', result.error);
       setError(result.error);
       setLoading(false);
       return { success: false, error: result.error };

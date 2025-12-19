@@ -3,14 +3,8 @@
  */
 
 import type { AdminService } from '../services/adminService';
-import { MockAdminService } from '../services/adminService';
-
-let adminServiceInstance: AdminService | null = null;
+import { adminService } from '../config/admin';
 
 export function useAdminService(): AdminService {
-  if (!adminServiceInstance) {
-    // Using mock service for now - will be replaced with HTTP service when backend is connected
-    adminServiceInstance = new MockAdminService();
-  }
-  return adminServiceInstance;
+  return adminService;
 }
