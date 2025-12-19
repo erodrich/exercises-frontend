@@ -23,6 +23,8 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+ENV VITE_API_URL=http://backend:8080
+
 # Expose port
 EXPOSE 80
 
