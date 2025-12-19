@@ -4,9 +4,10 @@
  */
 
 import { useState } from 'react';
-import { ArrowLeft, Database } from 'lucide-react';
+import { ArrowLeft, Database, Dumbbell } from 'lucide-react';
 import type { User } from '../domain/models';
 import ExerciseManagement from './ExerciseManagement';
+import MuscleGroupManagement from './MuscleGroupManagement';
 
 interface AdminDashboardProps {
   user: User;
@@ -14,7 +15,7 @@ interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type AdminTab = 'exercises';
+type AdminTab = 'exercises' | 'muscle-groups';
 
 export default function AdminDashboard({
   user,
@@ -72,7 +73,17 @@ export default function AdminDashboard({
               <Database size={20} />
               Exercises
             </button>
-            {/* Add more tabs here for future admin features */}
+            <button
+              onClick={() => setActiveTab('muscle-groups')}
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
+                activeTab === 'muscle-groups'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Dumbbell size={20} />
+              Muscle Groups
+            </button>
           </div>
         </div>
       </div>
@@ -80,6 +91,7 @@ export default function AdminDashboard({
       {/* Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'exercises' && <ExerciseManagement />}
+        {activeTab === 'muscle-groups' && <MuscleGroupManagement />}
       </div>
     </div>
   );

@@ -1,3 +1,9 @@
+export interface MuscleGroup {
+  id: number;
+  name: string;
+  description?: string;
+}
+
 export interface Exercise {
   group: string;
   name: string;
