@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from './hooks';
+import { Role } from './domain/models';
 import AuthPage from './components/AuthPage';
 import AuthenticatedHome from './components/AuthenticatedHome';
 import ExerciseLogForm from './components/ExerciseLogForm';
+import AdminDashboard from './components/AdminDashboard';
 
-type Screen = 'home' | 'log';
+type Screen = 'home' | 'log' | 'admin';
 
 function App() {
   const { isAuthenticated, user, loading, login, register, logout } = useAuth();
@@ -12,6 +14,7 @@ function App() {
 
   const navigateToLog = () => setCurrentScreen('log');
   const navigateToHome = () => setCurrentScreen('home');
+  const navigateToAdmin = () => setCurrentScreen('admin');
 
   const handleLogout = async () => {
     await logout();
@@ -46,6 +49,13 @@ function App() {
         <AuthenticatedHome
           user={user!}
           onNavigateToLog={navigateToLog}
+          onNavigateToAdmin={user?.role === Role.ADMIN ? navigateToAdmin : undefined}
+          onLogout={handleLogout}
+        />
+      ) : currentScreen === 'admin' ? (
+        <AdminDashboard
+          user={user!}
+          onNavigateBack={navigateToHome}
           onLogout={handleLogout}
         />
       ) : (

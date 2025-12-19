@@ -9,3 +9,7 @@ export * from './useNotification';
 export * from './useNavigation';
 export * from './useAuth';
 export * from './useAuthService';
+export * from './useAdminService';
+
+// Re-export types from services
+export type { ExerciseWithId } from '../services/adminService';

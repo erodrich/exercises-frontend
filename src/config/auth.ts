@@ -17,7 +17,10 @@ const USE_MOCK_AUTH = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 export const createAuthService = (): AuthService => {
   if (USE_MOCK_AUTH) {
     console.log('🧪 Using Mock Authentication (localStorage)');
-    return new AuthService(new MockAuthStorage());
+    const mockAuth = new MockAuthStorage();
+    // Initialize admin user for testing
+    mockAuth.initializeAdminUser();
+    return new AuthService(mockAuth);
   } else {
     console.log('🌐 Using API Authentication (Backend)');
     return new AuthService(new ApiAuthAdapter());

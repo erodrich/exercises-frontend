@@ -3,6 +3,7 @@ import type {
   LoginCredentials,
   RegisterCredentials,
   Result,
+  Role,
 } from '../../domain/models';
 import type { AuthAdapter, AuthResponse } from '../adapters/AuthAdapter';
 
@@ -37,12 +38,13 @@ export class MockAuthStorage implements AuthAdapter {
         };
       }
 
-      // Create new user
+      // Create new user (default role is USER)
       const newUser: StoredUser = {
         id: this.generateId(),
         username: credentials.username,
         email: credentials.email,
         password: credentials.password, // In production, this would be hashed
+        role: 'USER' as Role,
       };
 
       // Store user
@@ -59,6 +61,7 @@ export class MockAuthStorage implements AuthAdapter {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
+        role: newUser.role,
       };
 
       return {
@@ -109,6 +112,7 @@ export class MockAuthStorage implements AuthAdapter {
         id: user.id,
         username: user.username,
         email: user.email,
+        role: user.role,
       };
 
       return {
@@ -220,9 +224,30 @@ export class MockAuthStorage implements AuthAdapter {
       id: user.id,
       username: user.username,
       email: user.email,
+      role: user.role,
     };
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(publicUser));
+  }
+  
+  /**
+   * Helper: Initialize admin user if not exists
+   * This is for testing purposes - in production, admin would be created in backend
+   */
+  initializeAdminUser(): void {
+    const adminEmail = 'admin@exercises.com';
+    const existingAdmin = this.findUserByEmail(adminEmail);
+    
+    if (!existingAdmin) {
+      const adminUser: StoredUser = {
+        id: 'admin_1',
+        username: 'admin',
+        email: adminEmail,
+        password: 'Admin123!',
+        role: 'ADMIN' as Role,
+      };
+      this.saveUser(adminUser);
+    }
   }
 
   /**

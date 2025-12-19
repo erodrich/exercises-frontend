@@ -44,10 +44,18 @@ export type Result<T> =
  * Authentication Models
  */
 
+export const Role = {
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+} as const;
+
+export type Role = typeof Role[keyof typeof Role];
+
 export interface User {
   id: string;
   username: string;
   email: string;
+  role: Role;
 }
 
 export interface AuthState {
