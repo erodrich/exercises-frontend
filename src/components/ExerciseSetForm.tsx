@@ -9,6 +9,7 @@ interface ExerciseSetFormProps {
   onUpdate: (updates: Partial<ExerciseSet>) => void;
   onRemove: () => void;
   isRemovable: boolean;
+  isHighlighted?: boolean;
 }
 
 const ExerciseSetForm: React.FC<ExerciseSetFormProps> = ({
@@ -16,10 +17,15 @@ const ExerciseSetForm: React.FC<ExerciseSetFormProps> = ({
   index,
   onUpdate,
   onRemove,
-  isRemovable
+  isRemovable,
+  isHighlighted = false
 }) => {
   return (
-    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+    <div className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-500 ${
+      isHighlighted 
+        ? 'bg-blue-50 border-blue-300 shadow-md scale-[1.02]' 
+        : 'bg-white border-gray-200'
+    }`}>
       <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-700 font-medium rounded-full">
         {index + 1}
       </div>

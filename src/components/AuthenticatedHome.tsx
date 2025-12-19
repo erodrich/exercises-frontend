@@ -1,10 +1,11 @@
 import React from 'react';
-import { Dumbbell, Plus, LogOut, User, Shield } from 'lucide-react';
+import { Dumbbell, Plus, LogOut, User, Shield, History } from 'lucide-react';
 import type { User as UserType } from '../domain/models';
 
 interface AuthenticatedHomeProps {
   user: UserType;
   onNavigateToLog: () => void;
+  onNavigateToLogs: () => void;
   onNavigateToAdmin?: () => void;
   onLogout: () => void;
 }
@@ -12,6 +13,7 @@ interface AuthenticatedHomeProps {
 const AuthenticatedHome: React.FC<AuthenticatedHomeProps> = ({
   user,
   onNavigateToLog,
+  onNavigateToLogs,
   onNavigateToAdmin,
   onLogout,
 }) => {
@@ -64,6 +66,15 @@ const AuthenticatedHome: React.FC<AuthenticatedHomeProps> = ({
             >
               <Plus className="w-6 h-6" />
               Log New Workout
+            </button>
+            
+            {/* View Logs Button */}
+            <button
+              onClick={onNavigateToLogs}
+              className="w-full max-w-sm mx-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3"
+            >
+              <History className="w-5 h-5" />
+              View My Logs
             </button>
             
             {/* Admin Button - Only shown for admin users */}

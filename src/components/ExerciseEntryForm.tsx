@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import type { ExerciseLogEntry } from '../domain/models';
 import { EXERCISE_GROUPS } from '../data/exerciseGroups';
 import ExerciseSetForm from './ExerciseSetForm';
-import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell } from 'lucide-react';
+import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface ExerciseEntryFormProps {
@@ -26,6 +26,7 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
   onMoveDown
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [highlightedSetIndex, setHighlightedSetIndex] = useState<number | null>(null);
 
   const addSet = () => {
     const lastSet = entry.sets[entry.sets.length - 1];
@@ -33,7 +34,16 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
       weight: lastSet?.weight || 0,
       reps: lastSet?.reps || 0
     };
+    const newSetIndex = entry.sets.length;
     onUpdate({ sets: [...entry.sets, newSet] });
+    
+    // Highlight the newly added set
+    setHighlightedSetIndex(newSetIndex);
+    
+    // Remove highlight after 2 seconds
+    setTimeout(() => {
+      setHighlightedSetIndex(null);
+    }, 2000);
   };
 
   const updateSet = (setIndex: number, updates: Partial<ExerciseLogEntry['sets'][0]>) => {
@@ -200,6 +210,7 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
                   onUpdate={(updates) => updateSet(setIndex, updates)}
                   onRemove={() => removeSet(setIndex)}
                   isRemovable={entry.sets.length > 1}
+                  isHighlighted={highlightedSetIndex === setIndex}
                 />
               ))}
             </div>
@@ -210,14 +221,42 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
             <label className="block text-sm font-medium text-gray-900 mb-1">
               Time
             </label>
-            <input
-              type="datetime-local"
-              value={format(new Date(entry.timestamp), "yyyy-MM-dd'T'HH:mm")}
-              onChange={(e) => onUpdate({
-                timestamp: new Date(e.target.value).toISOString()
-              })}
-              className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={format(new Date(entry.timestamp), "dd/MM/yyyy HH:mm:ss")}
+                onChange={(e) => {
+                  // Parse DD/MM/YYYY HH:mm:ss format
+                  const match = e.target.value.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/);
+                  if (match) {
+                    const [, day, month, year, hour, minute, second] = match;
+                    const date = new Date(
+                      parseInt(year),
+                      parseInt(month) - 1,
+                      parseInt(day),
+                      parseInt(hour),
+                      parseInt(minute),
+                      parseInt(second)
+                    );
+                    if (!isNaN(date.getTime())) {
+                      onUpdate({ timestamp: date.toISOString() });
+                    }
+                  }
+                }}
+                placeholder="DD/MM/YYYY HH:mm:ss"
+                className="flex-1 px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => onUpdate({ timestamp: new Date().toISOString() })}
+                className="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-50 text-blue-700 font-medium rounded-lg hover:bg-blue-100 transition-colors whitespace-nowrap"
+                title="Set to current time"
+              >
+                <Clock className="w-4 h-4" />
+                Now
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Format: DD/MM/YYYY HH:mm:ss (e.g., 19/12/2025 14:30:00)</p>
           </div>
         </div>
       )}

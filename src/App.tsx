@@ -4,9 +4,10 @@ import { Role } from './domain/models';
 import AuthPage from './components/AuthPage';
 import AuthenticatedHome from './components/AuthenticatedHome';
 import ExerciseLogForm from './components/ExerciseLogForm';
+import ExerciseLogsPage from './components/ExerciseLogsPage';
 import AdminDashboard from './components/AdminDashboard';
 
-type Screen = 'home' | 'log' | 'admin';
+type Screen = 'home' | 'log' | 'logs' | 'admin';
 
 function App() {
   const { isAuthenticated, user, loading, login, register, logout } = useAuth();
@@ -21,6 +22,7 @@ function App() {
   }, [isAuthenticated, loading]);
 
   const navigateToLog = () => setCurrentScreen('log');
+  const navigateToLogs = () => setCurrentScreen('logs');
   const navigateToHome = () => setCurrentScreen('home');
   const navigateToAdmin = () => setCurrentScreen('admin');
 
@@ -58,8 +60,14 @@ function App() {
         <AuthenticatedHome
           user={user!}
           onNavigateToLog={navigateToLog}
+          onNavigateToLogs={navigateToLogs}
           onNavigateToAdmin={user?.role === Role.ADMIN ? navigateToAdmin : undefined}
           onLogout={handleLogout}
+        />
+      ) : currentScreen === 'logs' ? (
+        <ExerciseLogsPage
+          user={user!}
+          onNavigateBack={navigateToHome}
         />
       ) : currentScreen === 'admin' ? (
         <AdminDashboard
