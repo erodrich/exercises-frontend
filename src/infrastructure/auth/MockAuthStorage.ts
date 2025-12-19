@@ -84,17 +84,21 @@ export class MockAuthStorage implements AuthAdapter {
    */
   async login(credentials: LoginCredentials): Promise<Result<AuthResponse>> {
     try {
+      console.log('[MockAuthStorage] Login attempt for:', credentials.email);
       // Find user by email
       const user = this.findUserByEmail(credentials.email);
       if (!user) {
+        console.log('[MockAuthStorage] User not found');
         return {
           success: false,
           error: 'Invalid email or password',
         };
       }
 
+      console.log('[MockAuthStorage] User found, checking password');
       // Check password
       if (user.password !== credentials.password) {
+        console.log('[MockAuthStorage] Password mismatch');
         return {
           success: false,
           error: 'Invalid email or password',
