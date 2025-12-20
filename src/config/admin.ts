@@ -5,10 +5,10 @@
 
 import { HttpAdminService, MockAdminService } from '../services/adminService';
 import type { AdminService } from '../services/adminService';
+import API_CONFIG from './api';
 
 // Determine which service to use based on environment variable
 const USE_MOCK_ADMIN = import.meta.env.VITE_USE_MOCK_ADMIN === 'true';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 /**
  * Create and export the admin service instance
@@ -19,8 +19,8 @@ export const createAdminService = (): AdminService => {
     console.log('🧪 Using Mock Admin Service (in-memory)');
     return new MockAdminService();
   } else {
-    console.log('🌐 Using HTTP Admin Service (Backend API)');
-    return new HttpAdminService(API_URL, () => {
+    console.log('🌐 Using HTTP Admin Service (Backend API)', API_CONFIG.baseURL);
+    return new HttpAdminService(API_CONFIG.baseURL, () => {
       // Get token - try both mock and real auth token keys
       return localStorage.getItem('auth_token') || localStorage.getItem('mock_auth_token');
     });

@@ -6,9 +6,9 @@
 import { useMemo } from 'react';
 import { HttpAdminMuscleGroupService, MockAdminMuscleGroupService } from '../services/adminMuscleGroupService';
 import type { AdminMuscleGroupService } from '../services/adminMuscleGroupService';
+import API_CONFIG from '../config/api';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useAdminMuscleGroupService(): AdminMuscleGroupService {
   const service = useMemo(() => {
@@ -16,7 +16,7 @@ export function useAdminMuscleGroupService(): AdminMuscleGroupService {
       return new MockAdminMuscleGroupService();
     }
     return new HttpAdminMuscleGroupService(
-      API_URL,
+      API_CONFIG.baseURL,
       () => {
         // Get token from localStorage (same as adminService)
         return localStorage.getItem('auth_token') || localStorage.getItem('mock_auth_token');
