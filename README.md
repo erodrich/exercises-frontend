@@ -34,7 +34,7 @@ cd ../exercises-infra/dev
 docker-compose up -d frontend
 ```
 
-📖 **See [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) for complete Docker guide**
+📖 **See [../exercises-infra/README.md](../exercises-infra/README.md) for complete deployment guide**
 
 ---
 
@@ -49,30 +49,7 @@ docker-compose up -d frontend
 
 ---
 
-## 📚 Documentation
 
-All documentation is located in the `docs/` directory:
-
-### Authentication
-- 📖 **[docs/AUTHENTICATION_REFACTOR.md](docs/AUTHENTICATION_REFACTOR.md)** - Authentication implementation guide
-- 📖 **[docs/AUTHENTICATION_ARCHITECTURE.md](docs/AUTHENTICATION_ARCHITECTURE.md)** - Architecture diagrams and patterns
-
-### Docker & Deployment
-- 📖 **[docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md)** - Docker deployment guide
-
-### Development Guides
-- 📖 **[docs/TDD_REFACTOR_COMPLETE.md](docs/TDD_REFACTOR_COMPLETE.md)** - Complete TDD refactoring
-- 📖 **[docs/QUICK_START_TESTING.md](docs/QUICK_START_TESTING.md)** - Testing quick reference
-- 📖 **[src/test/README.md](src/test/README.md)** - Comprehensive testing guide
-
-### Project History
-- 📖 **[docs/TESTING_SETUP_COMPLETE.md](docs/TESTING_SETUP_COMPLETE.md)** - Phase 1: Testing infrastructure
-- 📖 **[docs/PHASE_1_SUMMARY.md](docs/PHASE_1_SUMMARY.md)** - Phase 1 summary
-- 📖 **[docs/PHASE_2_COMPLETE.md](docs/PHASE_2_COMPLETE.md)** - Phase 2: Domain extraction
-- 📖 **[docs/PHASE_2_SUMMARY.md](docs/PHASE_2_SUMMARY.md)** - Phase 2 summary
-- 📖 **[docs/REFACTOR_COMPLETE_SUMMARY.md](docs/REFACTOR_COMPLETE_SUMMARY.md)** - Complete summary
-
----
 
 ## 🏗️ Architecture
 
@@ -299,7 +276,7 @@ docker-compose up -d
 - Backend API: http://localhost:8080/exercise-logging
 - Swagger UI: http://localhost:8080/exercise-logging/swagger-ui/index.html
 
-📖 **Complete deployment guide**: [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md)
+📖 **Complete deployment guide**: [../exercises-infra/README.md](../exercises-infra/README.md)
 
 ---
 
@@ -319,11 +296,6 @@ The architecture makes it easy to add:
 ---
 
 ## 🎓 Learning Resources
-
-### Project Documentation
-- [Complete Refactor Guide](./TDD_REFACTOR_COMPLETE.md)
-- [Testing Guide](./src/test/README.md)
-- [Quick Reference](./QUICK_START_TESTING.md)
 
 ### External Resources
 - [Vitest Documentation](https://vitest.dev/)
@@ -359,10 +331,10 @@ This is a demonstration project showcasing professional software engineering pra
 
 ## 🆘 Need Help?
 
-1. Check the [Testing Guide](./src/test/README.md)
-2. Read the [Quick Start](./QUICK_START_TESTING.md)
-3. Review the [Complete Documentation](./TDD_REFACTOR_COMPLETE.md)
-4. Run tests to see examples: `npm test`
+1. Check test files for examples
+2. Run tests: `npm test`
+3. Review architecture section above
+4. See deployment guide in ../exercises-infra/
 
 ---
 
