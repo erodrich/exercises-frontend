@@ -1,10 +1,13 @@
 /* src/components/ExerciseEntryForm.tsx */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ExerciseLogEntry } from '../domain/models';
-import { EXERCISE_GROUPS } from '../data/exerciseGroups';
+import type { MuscleGroup } from '../types/exercise';
 import ExerciseSetForm from './ExerciseSetForm';
 import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { HttpMuscleGroupService } from '../services/muscleGroupService';
+import { HttpPublicExerciseService } from '../services/publicExerciseService';
+import API_CONFIG from '../config/api';
 
 interface ExerciseEntryFormProps {
   entry: ExerciseLogEntry;
@@ -27,6 +30,48 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [highlightedSetIndex, setHighlightedSetIndex] = useState<number | null>(null);
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
+  const [exercises, setExercises] = useState<{id: number, name: string, group: string}[]>([]);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [loadingExercises, setLoadingExercises] = useState(false);
+
+  // Fetch muscle groups on mount
+  useEffect(() => {
+    const fetchMuscleGroups = async () => {
+      setLoadingGroups(true);
+      const service = new HttpMuscleGroupService(API_CONFIG.baseURL);
+      const result = await service.getAllMuscleGroups();
+      if (result.success) {
+        setMuscleGroups(result.data);
+      }
+      setLoadingGroups(false);
+    };
+    fetchMuscleGroups();
+  }, []);
+
+  // Fetch exercises when muscle group changes
+  useEffect(() => {
+    const fetchExercises = async () => {
+      if (!entry.exercise.group) {
+        setExercises([]);
+        return;
+      }
+
+      setLoadingExercises(true);
+      const service = new HttpPublicExerciseService(API_CONFIG.baseURL);
+      const result = await service.getAllExercises();
+      
+      if (result.success) {
+        // Filter exercises by selected muscle group
+        const filtered = result.data.filter(
+          (ex) => ex.group.toUpperCase() === entry.exercise.group.toUpperCase()
+        );
+        setExercises(filtered);
+      }
+      setLoadingExercises(false);
+    };
+    fetchExercises();
+  }, [entry.exercise.group]);
 
   const addSet = () => {
     const lastSet = entry.sets[entry.sets.length - 1];
@@ -136,11 +181,12 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
                 onChange={(e) => onUpdate({
                   exercise: { ...entry.exercise, group: e.target.value, name: '' }
                 })}
-                className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={loadingGroups}
+                className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
               >
-                <option value="">Select group</option>
-                {Object.keys(EXERCISE_GROUPS).map((group) => (
-                  <option key={group} value={group}>{group}</option>
+                <option value="">{loadingGroups ? 'Loading...' : 'Select group'}</option>
+                {muscleGroups.map((group) => (
+                  <option key={group.id} value={group.name}>{group.name}</option>
                 ))}
               </select>
             </div>
@@ -155,11 +201,12 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
                   onChange={(e) => onUpdate({
                     exercise: { ...entry.exercise, name: e.target.value }
                   })}
-                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={loadingExercises}
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                 >
-                  <option value="">Select exercise</option>
-                  {EXERCISE_GROUPS[entry.exercise.group as keyof typeof EXERCISE_GROUPS]?.map((exercise) => (
-                    <option key={exercise} value={exercise}>{exercise}</option>
+                  <option value="">{loadingExercises ? 'Loading...' : 'Select exercise'}</option>
+                  {exercises.map((exercise) => (
+                    <option key={exercise.id} value={exercise.name}>{exercise.name}</option>
                   ))}
                 </select>
               </div>
