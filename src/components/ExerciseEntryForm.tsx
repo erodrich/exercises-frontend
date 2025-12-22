@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import type { ExerciseLogEntry } from '../domain/models';
 import type { MuscleGroup } from '../types/exercise';
 import ExerciseSetForm from './ExerciseSetForm';
+import LatestLogDisplay from './LatestLogDisplay';
 import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { HttpMuscleGroupService } from '../services/muscleGroupService';
 import { HttpPublicExerciseService } from '../services/publicExerciseService';
+import { useExerciseService } from '../hooks/useExerciseService';
 import API_CONFIG from '../config/api';
 
 interface ExerciseEntryFormProps {
@@ -34,6 +36,9 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
   const [exercises, setExercises] = useState<{id: number, name: string, group: string}[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [loadingExercises, setLoadingExercises] = useState(false);
+  const [latestLog, setLatestLog] = useState<ExerciseLogEntry | null>(null);
+  const [loadingLatestLog, setLoadingLatestLog] = useState(false);
+  const exerciseService = useExerciseService();
 
   // Fetch muscle groups on mount
   useEffect(() => {
@@ -72,6 +77,41 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
     };
     fetchExercises();
   }, [entry.exercise.group]);
+
+  // Fetch latest log when exercise is selected
+  useEffect(() => {
+    const fetchLatestLog = async () => {
+      // Reset previous log
+      setLatestLog(null);
+
+      // Need both muscle group and exercise name selected
+      if (!entry.exercise.group || !entry.exercise.name) {
+        return;
+      }
+
+      // Find the exercise ID from the exercises list
+      const selectedExercise = exercises.find(
+        (ex) => ex.name === entry.exercise.name
+      );
+
+      if (!selectedExercise) {
+        return;
+      }
+
+      setLoadingLatestLog(true);
+      const result = await exerciseService.getLatestLog(selectedExercise.id);
+
+      if (result.success && result.data) {
+        setLatestLog(result.data);
+      } else if (!result.success) {
+        console.error('Failed to fetch latest log:', result.error);
+      }
+
+      setLoadingLatestLog(false);
+    };
+
+    fetchLatestLog();
+  }, [entry.exercise.name, exercises, exerciseService]);
 
   const addSet = () => {
     const lastSet = entry.sets[entry.sets.length - 1];
@@ -212,6 +252,11 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
               </div>
             )}
           </div>
+
+          {/* Latest Log Display */}
+          {entry.exercise.name && (
+            <LatestLogDisplay latestLog={latestLog} isLoading={loadingLatestLog} />
+          )}
 
           {/* Failure Toggle */}
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">

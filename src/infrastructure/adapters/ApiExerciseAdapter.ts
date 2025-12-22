@@ -116,6 +116,62 @@ export class ApiExerciseAdapter {
   }
 
   /**
+   * Get latest exercise log for a specific exercise
+   */
+  async getLatestLog(userId: string, exerciseId: number): Promise<Result<ExerciseLogEntry | null>> {
+    try {
+      const response = await httpClient(
+        getEndpoint(`/api/v1/users/${userId}/logs/latest?exerciseId=${exerciseId}`),
+        {
+          method: 'GET',
+          requiresAuth: true,
+        }
+      );
+
+      // 404 means no logs found - this is expected for new exercises
+      if (response.status === 404) {
+        return {
+          success: true,
+          data: null,
+        };
+      }
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `Failed to fetch latest log: ${response.status}`,
+        };
+      }
+
+      const apiLog: ApiExerciseLogDTO = await response.json();
+
+      // Convert from backend format to frontend format
+      const entry: ExerciseLogEntry = {
+        timestamp: apiLog.timestamp,
+        exercise: {
+          group: apiLog.exercise.group,
+          name: apiLog.exercise.name,
+        },
+        sets: apiLog.sets.map(set => ({
+          weight: set.weight,
+          reps: set.reps,
+        })),
+        failure: apiLog.failure,
+      };
+
+      return {
+        success: true,
+        data: entry,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to fetch latest log: ${error instanceof Error ? error.message : 'Network error'}`,
+      };
+    }
+  }
+
+  /**
    * Delete exercise (not implemented in backend yet)
    * For now, this is a no-op
    */

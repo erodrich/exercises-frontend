@@ -162,4 +162,35 @@ export class ExerciseService {
       ),
     };
   }
+
+  /**
+   * Get latest log for a specific exercise
+   * Only works with API mode and authenticated user
+   */
+  async getLatestLog(exerciseId: number): Promise<Result<ExerciseLogEntry | null>> {
+    try {
+      // API mode required
+      if (!this.useApi) {
+        return {
+          success: false,
+          error: 'API mode required for fetching latest log',
+        };
+      }
+
+      // User authentication required
+      if (!this.currentUser) {
+        return {
+          success: false,
+          error: 'User authentication required',
+        };
+      }
+
+      return await this.apiAdapter.getLatestLog(this.currentUser.id, exerciseId);
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to get latest log: ${error}`,
+      };
+    }
+  }
 }

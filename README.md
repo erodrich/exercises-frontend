@@ -40,8 +40,9 @@ docker-compose up -d frontend
 
 ## 📊 Project Status
 
-- ✅ **216 tests passing** (96%+ coverage)
+- ✅ **267 tests passing** (96%+ coverage)
 - ✅ **Authentication system** - Login/Register with validation
+- ✅ **Latest log display** - See previous workout when logging exercises
 - ✅ **Production ready**
 - ✅ **Clean architecture**
 - ✅ **TypeScript strict mode**
@@ -148,13 +149,16 @@ Lines:        98.7%  ✅
 - **44 tests** - Service layer (with mocked dependencies)
   - 23 tests - AuthService
   - 21 tests - ExerciseService
-- **37 tests** - Infrastructure layer
+- **45 tests** - Infrastructure layer
   - 17 tests - MockAuthStorage
   - 20 tests - LocalStorage
-- **6 tests** - Component layer (React Testing Library)
+  - 8 tests - ApiExerciseAdapter (including latest log)
+- **15 tests** - Component layer (React Testing Library)
+  - 6 tests - Home components
+  - 9 tests - LatestLogDisplay component
 - **12 tests** - Test infrastructure (setup, factories)
 
-**Total: 216 tests ✅**
+**Total: 267 tests ✅** (51 new tests)
 
 ---
 
@@ -171,6 +175,7 @@ Lines:        98.7%  ✅
 - ✅ **User Authentication** - Login/Register with validation
 - ✅ **Session Management** - Persistent login across page refreshes
 - ✅ **Exercise Logging** - Track workouts with sets, weight, reps
+- ✅ **Latest Log Display** - See your previous workout when selecting an exercise
 - ✅ **Local Storage** - Data persistence (auth + exercises)
 - ✅ **Validation** - Comprehensive input validation (auth + exercises)
 - ✅ **Calculations** - Volume, 1RM estimation, statistics
@@ -313,9 +318,10 @@ This is a demonstration project showcasing professional software engineering pra
 
 ## 🏆 Achievements
 
-- ✅ **216 tests** (72 new auth tests)
+- ✅ **267 tests** (51 new tests for latest log feature)
 - ✅ **96%+ coverage** maintained
 - ✅ **Authentication system** - Login/Register/Logout
+- ✅ **Latest log display** - See previous workout when logging
 - ✅ **Clean architecture** implemented
 - ✅ **Production ready** code quality
 - ✅ **Comprehensive documentation**
