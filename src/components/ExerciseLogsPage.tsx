@@ -4,10 +4,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, Dumbbell, TrendingUp, Filter, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Calendar, Dumbbell, Filter, RefreshCw } from 'lucide-react';
 import type { User, ExerciseLogEntry } from '../domain/models';
 import { useExerciseService } from '../hooks';
-import { calculateTotalVolume } from '../domain/calculators/volumeCalculator';
 
 interface ExerciseLogsPageProps {
   user: User;
@@ -19,7 +18,7 @@ export default function ExerciseLogsPage({ user, onNavigateBack }: ExerciseLogsP
   const [logs, setLogs] = useState<ExerciseLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterGroup, setFilterGroup] = useState<string>('ALL');
-  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'volume'>('date-desc');
+  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc'>('date-desc');
 
   useEffect(() => {
     loadLogs();
@@ -105,18 +104,14 @@ export default function ExerciseLogsPage({ user, onNavigateBack }: ExerciseLogsP
     .sort((a, b) => {
       if (sortBy === 'date-desc') {
         return parseTimestamp(b.timestamp).getTime() - parseTimestamp(a.timestamp).getTime();
-      } else if (sortBy === 'date-asc') {
-        return parseTimestamp(a.timestamp).getTime() - parseTimestamp(b.timestamp).getTime();
       } else {
-        // Sort by volume
-        return calculateTotalVolume(b.sets) - calculateTotalVolume(a.sets);
+        return parseTimestamp(a.timestamp).getTime() - parseTimestamp(b.timestamp).getTime();
       }
     });
 
   // Calculate statistics
   const totalWorkouts = logs.length;
   const totalSets = logs.reduce((sum, log) => sum + log.sets.length, 0);
-  const totalVolume = logs.reduce((sum, log) => sum + calculateTotalVolume(log.sets), 0);
 
   const formatDate = (timestamp: string) => {
     if (!timestamp) {
@@ -194,7 +189,7 @@ export default function ExerciseLogsPage({ user, onNavigateBack }: ExerciseLogsP
 
       {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3">
               <div className="bg-blue-100 p-3 rounded-full">
@@ -215,20 +210,6 @@ export default function ExerciseLogsPage({ user, onNavigateBack }: ExerciseLogsP
               <div>
                 <div className="text-2xl font-bold text-gray-900">{totalSets}</div>
                 <div className="text-sm text-gray-600">Total Sets</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-purple-100 p-3 rounded-full">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {totalVolume.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">Total Volume (kg)</div>
               </div>
             </div>
           </div>
@@ -264,7 +245,6 @@ export default function ExerciseLogsPage({ user, onNavigateBack }: ExerciseLogsP
               >
                 <option value="date-desc">Newest First</option>
                 <option value="date-asc">Oldest First</option>
-                <option value="volume">Highest Volume</option>
               </select>
             </div>
           </div>
@@ -285,71 +265,59 @@ export default function ExerciseLogsPage({ user, onNavigateBack }: ExerciseLogsP
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredLogs.map((log, index) => {
-              const volume = calculateTotalVolume(log.sets);
-              return (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
-                >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    {/* Exercise Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                          {log.exercise.group}
+            {filteredLogs.map((log, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
+              >
+                <div className="flex flex-col md:flex-row md:items-start gap-4">
+                  {/* Exercise Info */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                        {log.exercise.group}
+                      </span>
+                      {log.failure && (
+                        <span className="inline-block px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
+                          To Failure
                         </span>
-                        {log.failure && (
-                          <span className="inline-block px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
-                            To Failure
+                      )}
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900">
+                      {log.exercise.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {log.timestamp ? (
+                        <>
+                          {formatDate(log.timestamp)} at {formatTime(log.timestamp)}
+                        </>
+                      ) : (
+                        <span className="text-red-500">No timestamp available</span>
+                      )}
+                    </p>
+                  </div>
+
+                  {/* Sets Info */}
+                  <div className="flex-1">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-700">
+                        Sets ({log.sets.length}):
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {log.sets.map((set, setIndex) => (
+                          <span
+                            key={setIndex}
+                            className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-lg"
+                          >
+                            {set.weight} kg × {set.reps} reps
                           </span>
-                        )}
+                        ))}
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">
-                        {log.exercise.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {log.timestamp ? (
-                          <>
-                            {formatDate(log.timestamp)} at {formatTime(log.timestamp)}
-                          </>
-                        ) : (
-                          <span className="text-red-500">No timestamp available</span>
-                        )}
-                      </p>
-                    </div>
-
-                    {/* Sets Info */}
-                    <div className="flex-1">
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium text-gray-700">
-                          Sets ({log.sets.length}):
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {log.sets.map((set, setIndex) => (
-                            <span
-                              key={setIndex}
-                              className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-lg"
-                            >
-                              {set.weight} kg × {set.reps} reps
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Volume */}
-                    <div className="text-right">
-                      <div className="text-sm text-gray-600">Total Volume</div>
-                      <div className="text-2xl font-bold text-blue-600">
-                        {volume.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-gray-500">kg</div>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </div>

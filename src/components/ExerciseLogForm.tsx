@@ -2,7 +2,7 @@
 import React from 'react';
 import type { ExerciseLogEntry, User } from '../domain/models';
 import ExerciseEntryForm from './ExerciseEntryForm';
-import { Save, Copy, ArrowLeft, Dumbbell, User as UserIcon, LogOut } from 'lucide-react';
+import { Save, ArrowLeft, Dumbbell, User as UserIcon, LogOut } from 'lucide-react';
 import { useExerciseService } from '../hooks/useExerciseService';
 import { useExerciseForm } from '../hooks/useExerciseForm';
 import { useNotification } from '../hooks/useNotification';
@@ -40,11 +40,7 @@ const ExerciseLogForm: React.FC<ExerciseLogFormProps> = ({ user, onNavigateBack,
     submitForm();
   };
 
-  const copyToClipboard = () => {
-    const jsonString = JSON.stringify(entry, null, 2);
-    navigator.clipboard.writeText(jsonString);
-    notifier.info('JSON copied to clipboard!');
-  };
+
 
 
 
@@ -82,39 +78,18 @@ const ExerciseLogForm: React.FC<ExerciseLogFormProps> = ({ user, onNavigateBack,
       <form onSubmit={handleSubmit} className="p-4">
         <div className="max-w-2xl mx-auto space-y-4">
           {/* Page Header with Back Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {onNavigateBack && (
-                <button
-                  type="button"
-                  onClick={onNavigateBack}
-                  className="p-2 text-gray-700 hover:bg-white/50 rounded-lg transition-colors"
-                  title="Back to Home"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-              )}
-              <h2 className="text-2xl font-bold text-gray-900">Log Exercise</h2>
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {onNavigateBack && (
               <button
                 type="button"
-                onClick={copyToClipboard}
-                className="p-2.5 text-gray-700 hover:bg-white rounded-lg transition-colors shadow-sm"
-                title="Copy JSON"
+                onClick={onNavigateBack}
+                className="p-2 text-gray-700 hover:bg-white/50 rounded-lg transition-colors"
+                title="Back to Home"
               >
-                <Copy className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors shadow-lg"
-                title="Save Exercise"
-              >
-                <Save className="w-5 h-5" />
-                <span className="font-medium">Save</span>
-              </button>
-            </div>
+            )}
+            <h2 className="text-2xl font-bold text-gray-900">Log Exercise</h2>
           </div>
 
           {/* Errors */}
@@ -130,22 +105,28 @@ const ExerciseLogForm: React.FC<ExerciseLogFormProps> = ({ user, onNavigateBack,
           <div className="bg-white rounded-xl shadow-lg p-6">
             <ExerciseEntryForm
               entry={entry}
-              index={0}
-              totalEntries={1}
               onUpdate={updateEntry}
-              onRemove={() => {}}
-              onMoveUp={() => {}}
-              onMoveDown={() => {}}
             />
           </div>
 
-          {/* Loading State */}
-          {isSubmitting && (
-            <div className="text-center text-gray-700 py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              <p className="font-medium">Saving exercise...</p>
-            </div>
-          )}
+          {/* Save Button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors shadow-lg font-medium text-lg"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                <span>Save Exercise</span>
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>

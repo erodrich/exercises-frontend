@@ -4,7 +4,7 @@ import type { ExerciseLogEntry } from '../domain/models';
 import type { MuscleGroup } from '../types/exercise';
 import ExerciseSetForm from './ExerciseSetForm';
 import LatestLogDisplay from './LatestLogDisplay';
-import { Plus, Trash2, ChevronUp, ChevronDown, Dumbbell, Clock } from 'lucide-react';
+import { Plus, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { HttpMuscleGroupService } from '../services/muscleGroupService';
 import { HttpPublicExerciseService } from '../services/publicExerciseService';
@@ -13,24 +13,13 @@ import API_CONFIG from '../config/api';
 
 interface ExerciseEntryFormProps {
   entry: ExerciseLogEntry;
-  index: number;
-  totalEntries: number;
   onUpdate: (updates: Partial<ExerciseLogEntry>) => void;
-  onRemove: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
 }
 
 const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
   entry,
-  index,
-  totalEntries,
-  onUpdate,
-  onRemove,
-  onMoveUp,
-  onMoveDown
+  onUpdate
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [highlightedSetIndex, setHighlightedSetIndex] = useState<number | null>(null);
   const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
   const [exercises, setExercises] = useState<{id: number, name: string, group: string}[]>([]);
@@ -143,73 +132,8 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
     onUpdate({ sets: newSets });
   };
 
-  const calculateVolume = () => {
-    return entry.sets.reduce((total, set) => total + (set.weight * set.reps), 0);
-  };
-
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header */}
-      <div 
-        className="p-4 flex items-center justify-between border-b border-gray-200 cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Dumbbell className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">
-              {entry.exercise.name || 'New Exercise'}
-            </h3>
-            <p className="text-sm text-gray-500">
-              {entry.sets.length} sets • {calculateVolume().toFixed(1)} kg total
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <div className="flex flex-col gap-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMoveUp();
-              }}
-              disabled={index === 0}
-              className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMoveDown();
-              }}
-              disabled={index === totalEntries - 1}
-              className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </button>
-          </div>
-          
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
-      {isExpanded && (
-        <div className="p-4 space-y-4">
+    <div className="space-y-4">
           {/* Exercise Selection */}
           <div className="space-y-3">
             <div>
@@ -350,8 +274,6 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
             </div>
             <p className="text-xs text-gray-500 mt-1">Format: DD/MM/YYYY HH:mm:ss (e.g., 19/12/2025 14:30:00)</p>
           </div>
-        </div>
-      )}
     </div>
   );
 };
