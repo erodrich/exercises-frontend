@@ -6,8 +6,9 @@ import AuthenticatedHome from './components/AuthenticatedHome';
 import ExerciseLogForm from './components/ExerciseLogForm';
 import ExerciseLogsPage from './components/ExerciseLogsPage';
 import AdminDashboard from './components/AdminDashboard';
+import WorkoutPlanManagement from './components/WorkoutPlanManagement';
 
-type Screen = 'home' | 'log' | 'logs' | 'admin';
+type Screen = 'home' | 'log' | 'logs' | 'admin' | 'workout-plans';
 
 function App() {
   const { isAuthenticated, user, loading, login, register, logout } = useAuth();
@@ -25,6 +26,7 @@ function App() {
   const navigateToLogs = () => setCurrentScreen('logs');
   const navigateToHome = () => setCurrentScreen('home');
   const navigateToAdmin = () => setCurrentScreen('admin');
+  const navigateToWorkoutPlans = () => setCurrentScreen('workout-plans');
 
   const handleLogout = async () => {
     await logout();
@@ -61,6 +63,7 @@ function App() {
           user={user!}
           onNavigateToLog={navigateToLog}
           onNavigateToLogs={navigateToLogs}
+          onNavigateToWorkoutPlans={navigateToWorkoutPlans}
           onNavigateToAdmin={user?.role === Role.ADMIN ? navigateToAdmin : undefined}
           onLogout={handleLogout}
         />
@@ -74,6 +77,11 @@ function App() {
           user={user!}
           onNavigateBack={navigateToHome}
           onLogout={handleLogout}
+        />
+      ) : currentScreen === 'workout-plans' ? (
+        <WorkoutPlanManagement
+          user={user!}
+          onNavigateBack={navigateToHome}
         />
       ) : (
         <ExerciseLogForm

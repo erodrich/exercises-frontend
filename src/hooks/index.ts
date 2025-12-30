@@ -12,6 +12,8 @@ export * from './useAuthService';
 export * from './useAdminService';
 export * from './useMuscleGroupService';
 export * from './useAdminMuscleGroupService';
+export * from './useWorkoutPlanService';
+export * from './usePublicExerciseService';
 
 // Re-export types from services
 export type { ExerciseWithId } from '../services/adminService';

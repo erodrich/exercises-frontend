@@ -75,3 +75,8 @@ export interface RegisterCredentials {
   password: string;
   confirmPassword: string;
 }
+
+/**
+ * Workout Plan Models
+ */
+export * from './workoutPlan';
