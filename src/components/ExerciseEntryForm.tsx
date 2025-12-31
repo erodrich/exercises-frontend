@@ -140,8 +140,8 @@ const ExerciseEntryForm: React.FC<ExerciseEntryFormProps> = ({
                         // Find all exercise targets that match the selected exercise
                         const matchingTargets: ExerciseTargetWithDay[] = [];
 
-                        activePlan.workoutDays.forEach(day => {
-                            day.exercises.forEach(target => {
+                        activePlan.workoutDays.forEach((day) => {
+                            day.exercises.forEach((target) => {
                                 if (target.exercise &&
                                     target.exercise.name.toLowerCase() === entry.exercise.name.toLowerCase()) {
                                     matchingTargets.push({

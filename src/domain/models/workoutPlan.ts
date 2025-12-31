@@ -1,13 +1,9 @@
-// @ts-ignore
 /**
  * Workout Plan Domain Models
  * Pure TypeScript interfaces representing workout plans
  */
 
-export enum DurationUnit {
-    WEEKS = "WEEKS",
-    MONTHS = "MONTHS"
-}
+export type DurationUnit = 'WEEKS' | 'MONTHS';
 
 export interface ExerciseTarget {
     id?: string;
