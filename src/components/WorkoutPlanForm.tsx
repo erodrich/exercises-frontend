@@ -137,10 +137,12 @@ export default function WorkoutPlanForm({plan, onSubmit, onCancel}: WorkoutPlanF
         const selectedGroup = selectedMuscleGroupsByDay[dayKey];
 
         if (!selectedGroup) {
-            return availableExercises;
+            return availableExercises.sort((a, b) => a.name.localeCompare(b.name));
         }
 
-        return availableExercises.filter(ex => ex.group === selectedGroup);
+        return availableExercises
+            .filter(ex => ex.group === selectedGroup)
+            .sort((a, b) => a.name.localeCompare(b.name));
     };
 
     const handleMuscleGroupChange = (dayIndex: number, exerciseIndex: number, muscleGroup: string) => {
